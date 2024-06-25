@@ -144,5 +144,3 @@ class User:
         """
         return connectToMySQL(cls.myDB).query_db(query,data)
 
-
-    # Delete Users Models

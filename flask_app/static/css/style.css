@@ -2,3 +2,22 @@ html {
     background-color: darkblue;
     color: aliceblue;
 }
+
+/* Example custom.css */
+.btn-primary, .btn-danger {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-danger:hover {
+    transform: translateY(-2px);
+}
+
+.text-light {
+    color: #f8f9fa !important; /* Ensuring text color */
+}
+
+.bg-dark-subtle {
+    background-color: #343a40; /* Custom subtle dark background */
+}
+
+/* Add more custom styles as needed */

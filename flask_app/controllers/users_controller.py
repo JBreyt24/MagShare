@@ -54,6 +54,8 @@ def login():
         return redirect('/')
     session['user_id'] = user_in_db.id
     session['first_name'] = user_in_db.first_name
+    session['last_name'] = user_in_db.last_name
+    session['email'] = user_in_db.email
     return redirect('/dashboard')
 
 
@@ -78,6 +80,8 @@ def update_info():
     id = User.save(data)
     session['user_id'] = id
     session['first_name'] = request.form['first_name']
+    session['last_name'] = request.form['last_name']
+    session['email'] = request.form['email']
     return redirect('/user/account')
 
 

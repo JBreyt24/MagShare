@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +7,16 @@
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <title>Add Magazine</title>
 </head>
-
-<body class="bg-dark-subtle">
-    <div class="container">
-        <h3 class="text-lg-start my-5 mb-4">Welcome, {{session['first_name']}}!</h3>
-        <div class="d-flex justify-content-between mb-3">
-            <h1 class="text-lg-start">Add a Magazine</h1>
-            <div class="d-flex justify-content-around align-items-center col-3">
-                <a href="/dashboard" class="btn btn-primary">Dashboard</a>
-                <a href="/logout" class="btn btn-primary">Logout</a>
+<body class="bg-dark">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between mb-3 align-items-center">
+            <h1 class="text-light">Add a Magazine</h1>
+            <div>
+                <a href="/dashboard" class="btn btn-primary me-2">Dashboard</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
             </div>
         </div>
-        <form action="/create/magazine" method="post" class="bg-dark text-white p-4 d-flex justify-content-between ">
+        <form action="/create/magazine" method="post" class="col-md-6 bg-dark text-white p-4 border rounded">
             {% with messages = get_flashed_messages(category_filter=['magazine']) %}
                 {% if messages %}
                     {% for message in messages %}
@@ -27,17 +24,15 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            <div class="col-5">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title:</label>
-                    <input type="text" name="title" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <textarea name="description" cols="30" rows="1" class="form-control"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" name="title" class="form-control">
             </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea name="description" cols="30" rows="3" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </body>
