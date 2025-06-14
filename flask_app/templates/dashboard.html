@@ -1,35 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <title>Dashboard</title>
+    <style>
+        :root {
+            --magshare-orange: #ff8c00;
+            --magshare-yellow: #ffd54f;
+            --magshare-gradient: linear-gradient(90deg, var(--magshare-yellow), var(--magshare-orange));
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #f8f9fa;
+        }
+
+        .navbar-magshare {
+            background: var(--magshare-gradient);
+        }
+
+        .btn-magshare {
+            background-color: var(--magshare-orange);
+            border: none;
+            color: white;
+        }
+
+        .btn-magshare:hover {
+            background-color: #e67e00;
+        }
+
+        .text-magshare {
+            color: var(--magshare-orange);
+        }
+    </style>
 </head>
-<body class="bg-dark">
-    <div class="container py-5">
-        <h3 class="text-center text-light mb-4">Welcome, {{session['first_name']}}!</h3>
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <h1 class="text-light">Magazines</h1>
-            <div>
-                <a href="/magazine/new" class="btn btn-primary me-2">Add Magazine</a>
-                <a href="/user/account" class="btn btn-primary me-2">Account</a>
-                <a href="/logout" class="btn btn-danger">Log Out</a>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-magshare mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-dark" href="#">MagShare</a>
+            <div class="d-flex">
+                <a href="/magazine/new" class="btn btn-dark me-2">Add Magazine</a>
+                <a href="/user/account" class="btn btn-dark me-2">Account</a>
+                <a href="/logout" class="btn btn-outline-dark">Log Out</a>
             </div>
         </div>
-        <table class="table table-dark table-striped table-hover">
-            <tbody>
-                {% for magazine in all_magazines %}
-                <tr>
-                    <td>
-                        <a href="/view/magazine/{{magazine.id}}/{{magazine.author.id}}" class="text-light">{{magazine.title}}</a>
-                    </td>
-                    <td>Added By: {{magazine.author.first_name}} {{magazine.author.last_name}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    </nav>
+
+    <main class="container">
+        <h2 class="text-center mb-4">Welcome, <span class="text-magshare">{{ session['first_name'] }}</span>!</h2>
+
+        <div class="card bg-secondary text-white shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">All Magazines</h4>
+                <a href="/magazine/new" class="btn btn-sm btn-magshare">+ Add New</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-dark table-striped table-hover mb-0">
+                    <tbody>
+                        {% for magazine in all_magazines %}
+                        <tr>
+                            <td class="ps-4">
+                                <a href="/view/magazine/{{ magazine.id }}/{{ magazine.author.id }}"
+                                    class="text-decoration-none text-magshare fw-semibold">
+                                    {{ magazine.title }}
+                                </a>
+                            </td>
+                            <td class="pe-4 text-end">Added by: {{ magazine.author.first_name }} {{
+                                magazine.author.last_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
