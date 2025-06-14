@@ -13,7 +13,7 @@ def magazine():
         return redirect('/logout')
     return render_template('add_magazine.html')
 
-@app.route('/create/magazine', methods = ['POST'])
+@app.route('/create/magazine', methods=['POST'])
 def create_magazine():
     if not Magazine.validate_magazine_at_create(request.form):
         return redirect('/magazine/new')
@@ -22,9 +22,9 @@ def create_magazine():
             "user_id": session["user_id"],
             "title": request.form['title'],
             "description": request.form['description'],
-    }
-    Magazine.save(magazine_dict)
-    return redirect('/dashboard')
+        }
+        Magazine.save(magazine_dict)
+        return redirect('/dashboard')
 
 # Read Magazine
 
@@ -34,20 +34,37 @@ def view_magazine(magazine_id, user_id):
         return redirect('/logout')
     magazine = Magazine.get_one(magazine_id)
     user = User.get_one(user_id)
-    return render_template("show_magazine.html", magazine = magazine, user = user )
-
+    return render_template("show_magazine.html", magazine=magazine, user=user)
 
 @app.route('/user/account')
 def account_magazines():
     if 'user_id' not in session:
         return redirect('/logout')
     magazine_by_user = Magazine.get_all_magazines_w_user()
-    return render_template('account.html', magazine_by_user = magazine_by_user)
+    return render_template('account.html', magazine_by_user=magazine_by_user)
 
+# Edit Magazine
 
-# Update Magazine
+@app.route('/magazine/edit/<int:id>')
+def edit_magazine(id):
+    if 'user_id' not in session:
+        return redirect('/logout')
+    magazine = Magazine.get_one(id)
+    return render_template('edit_magazine.html', magazine=magazine)
 
+@app.route('/magazine/update', methods=['POST'])
+def update_magazine():
+    if not Magazine.validate_magazine_at_edit(request.form):
+        return redirect(f"/magazine/edit/{request.form['id']}")
 
+    data = {
+        "id": request.form['id'],
+        "title": request.form['title'],
+        "description": request.form['description']
+    }
+    Magazine.edit_magazine(data)
+    flash("Magazine updated successfully!", "success")
+    return redirect('/dashboard')
 
 # Delete Magazine
 
@@ -56,4 +73,5 @@ def destroy_magazine(magazine_id):
     if 'user_id' not in session:
         return redirect('/logout')
     Magazine.destroy_magazine(magazine_id)
+    flash("Magazine deleted successfully!", "success")
     return redirect('/user/account')

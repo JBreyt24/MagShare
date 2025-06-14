@@ -51,6 +51,16 @@
     </nav>
 
     <main class="container">
+        <!-- Success Flash Message -->
+        {% with messages = get_flashed_messages(category_filter=['success']) %}
+        {% if messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ messages[0] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <h2 class="text-center mb-4">Welcome, <span class="text-magshare">{{ session['first_name'] }}</span>!</h2>
 
         <div class="card bg-secondary text-white shadow-sm">

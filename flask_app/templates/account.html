@@ -51,6 +51,16 @@
     </nav>
 
     <main class="container">
+        <!-- 🔔 Success Flash Message -->
+        {% with messages = get_flashed_messages(category_filter=['success']) %}
+        {% if messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ messages[0] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <div class="row">
             <div class="col-md-6">
                 <div class="card bg-secondary text-white mb-4 shadow-sm">
@@ -59,7 +69,7 @@
                     </div>
                     <div class="card-body">
                         <form action="/update/account" method="post">
-                            <input type="hidden" name="id" value="{{session['user_id']}}">
+                            <input type="hidden" name="id" value="{{ session['user_id'] }}">
                             {% with messages = get_flashed_messages(category_filter=['account']) %}
                             {% if messages %}
                             {% for message in messages %}
@@ -68,18 +78,18 @@
                             {% endif %}
                             {% endwith %}
                             <div class="mb-3">
-                                <label for="first_name" class="form-label">First Name</label>
-                                <input type="text" name="first_name" value="{{session['first_name']}}"
+                                <label for="first_name" class="form-label">First Name:</label>
+                                <input type="text" name="first_name" value="{{ session['first_name'] }}"
                                     class="form-control" />
                             </div>
                             <div class="mb-3">
-                                <label for="last_name" class="form-label">Last Name</label>
-                                <input type="text" name="last_name" value="{{session['last_name']}}"
+                                <label for="last_name" class="form-label">Last Name:</label>
+                                <input type="text" name="last_name" value="{{ session['last_name'] }}"
                                     class="form-control" />
                             </div>
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" name="email" value="{{session['email']}}" class="form-control" />
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" name="email" value="{{ session['email'] }}" class="form-control" />
                             </div>
                             <button type="submit" class="btn btn-magshare">Update</button>
                         </form>
@@ -97,7 +107,12 @@
                         {% if session['user_id'] == magazine.author.id %}
                         <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                             <p class="mb-0">{{ magazine.title }}</p>
-                            <a href="/magazine/destroy/{{magazine.id}}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <div>
+                                <a href="/magazine/edit/{{ magazine.id }}"
+                                    class="btn btn-outline-warning btn-sm me-2">Edit</a>
+                                <a href="/magazine/destroy/{{ magazine.id }}"
+                                    class="btn btn-outline-danger btn-sm">Delete</a>
+                            </div>
                         </div>
                         {% endif %}
                         {% endfor %}

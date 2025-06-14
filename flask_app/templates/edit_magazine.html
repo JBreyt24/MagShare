@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Edit Magazine</title>
+    <style>
+        :root {
+            --magshare-orange: #ff8c00;
+            --magshare-yellow: #ffd54f;
+            --magshare-gradient: linear-gradient(90deg, var(--magshare-yellow), var(--magshare-orange));
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #f8f9fa;
+        }
+
+        .navbar-magshare {
+            background: var(--magshare-gradient);
+        }
+
+        .btn-magshare {
+            background-color: var(--magshare-orange);
+            border: none;
+            color: white;
+        }
+
+        .btn-magshare:hover {
+            background-color: #e67e00;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-magshare mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-dark" href="#">MagShare</a>
+            <div class="d-flex">
+                <a href="/dashboard" class="btn btn-dark me-2">Dashboard</a>
+                <a href="/logout" class="btn btn-outline-dark">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card bg-secondary text-white shadow-sm">
+                    <div class="card-header">
+                        <h4 class="mb-0">Edit Magazine</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/magazine/update" method="post">
+                            <input type="hidden" name="id" value="{{ magazine.id }}" />
+                            {% with messages = get_flashed_messages(category_filter=['magazine']) %}
+                            {% if messages %}
+                            {% for message in messages %}
+                            <p class="text-danger">{{ message }}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {% endwith %}
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" name="title" value="{{ magazine.title }}" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea name="description" class="form-control"
+                                    rows="3">{{ magazine.description }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-magshare">Update Magazine</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
