@@ -131,5 +131,17 @@ class User:
 
     @classmethod
     def update_password(cls, data):
-        query = "UPDATE users SET password = %(password)s, updated_at = NOW() WHERE id = %(id)s;"
+        query = """
+        UPDATE users SET password = %(password)s, updated_at = NOW()
+        WHERE id = %(id)s;
+        """
         return connectToMySQL(cls.myDB).query_db(query, data)
+
+
+    @classmethod
+    def get_by_id(cls, data):
+        query = "SELECT * FROM users WHERE id = %(id)s;"
+        results = connectToMySQL(cls.myDB).query_db(query, data)
+        if not results:
+            return None
+        return cls(results[0])

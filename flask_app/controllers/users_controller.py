@@ -115,7 +115,8 @@ def user_account_magazines():
     if 'user_id' not in session:
         return redirect('/logout')
     
-    magazine_by_user = Magazine.get_all_magazines_w_user()
+    magazine_by_user = Magazine.get_by_author(session['user_id'])
+
     user_subscriptions = Subscription.get_user_subscriptions(session['user_id'])  # NEW
 
     return render_template('account.html', magazine_by_user=magazine_by_user, subscriptions=user_subscriptions)
@@ -128,29 +129,30 @@ def update_password():
     if 'user_id' not in session:
         return redirect('/logout')
 
-    data = {
-        'id': session['user_id'],
-        'current_password': request.form['current_password'],
-        'new_password': request.form['new_password'],
-        'confirm_password': request.form['confirm_password']
-    }
-
     user = User.get_by_id({'id': session['user_id']})
-
-    if not bcrypt.check_password_hash(user.password, data['current_password']):
-        flash("Current password is incorrect", "danger")
+    if not user:
+        flash("User not found.", "error")
         return redirect('/user/account')
 
-    if len(data['new_password']) < 8:
-        flash("New password must be at least 8 characters", "danger")
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+
+    if not bcrypt.check_password_hash(user.password, current_password):
+        flash("Current password is incorrect.", "error")
         return redirect('/user/account')
 
-    if data['new_password'] != data['confirm_password']:
-        flash("New password and confirmation do not match", "danger")
+    if new_password != confirm_password:
+        flash("New passwords do not match.", "error")
         return redirect('/user/account')
 
-    hashed_pw = bcrypt.generate_password_hash(data['new_password'])
-    User.update_password({'id': session['user_id'], 'password': hashed_pw})
+    if len(new_password) < 8:
+        flash("Password must be at least 8 characters long.", "error")
+        return redirect('/user/account')
 
+    pw_hash = bcrypt.generate_password_hash(new_password)
+
+    User.update_password({'id': session['user_id'], 'password': pw_hash})
     flash("Password successfully updated!", "success")
     return redirect('/user/account')
+

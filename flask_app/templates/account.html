@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,14 +36,12 @@
         }
     </style>
 </head>
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-magshare mb-4 shadow-sm">
         <div class="container">
             <h3 class="text-center text-dark">MagShare</h3>
             <div class="d-flex justify-content-center mb-4">
-                <img src="{{ url_for('static', filename='magshare.png') }}" alt="MagShare Logo"
-                    style="max-height: 100px;">
+                <img src="{{ url_for('static', filename='magshare.png') }}" alt="MagShare Logo" style="max-height: 100px;">
             </div>
             <div class="d-flex">
                 <a href="/dashboard" class="btn btn-dark me-2">Dashboard</a>
@@ -54,7 +51,6 @@
     </nav>
 
     <main class="container">
-        <!-- Success Flash Message -->
         {% with messages = get_flashed_messages(category_filter=['success']) %}
         {% if messages %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -119,18 +115,20 @@
                         <h4 class="mb-0">Change Password</h4>
                     </div>
                     <div class="card-body">
-                        <form action="/update/password" method="POST">
+                        <form action="/update/password" method="POST" onsubmit="return validatePasswordMatch()">
                             <div class="mb-3">
                                 <label for="current_password" class="form-label">Current Password</label>
                                 <input type="password" name="current_password" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label for="new_password" class="form-label">New Password</label>
-                                <input type="password" name="new_password" class="form-control" required>
+                                <input type="password" id="new_password" name="new_password" class="form-control" required minlength="8" oninput="checkPasswordStrength()">
+                                <div id="passwordStrength" class="form-text text-warning"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                <input type="password" name="confirm_password" class="form-control" required>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required oninput="checkPasswordMatch()">
+                                <div id="passwordMatchFeedback" class="form-text"></div>
                             </div>
                             <button type="submit" class="btn btn-magshare">Change Password</button>
                         </form>
@@ -151,7 +149,7 @@
                         <tr>
                             <td class="ps-4">
                                 <a href="/view/magazine/{{ magazine.id }}/{{ magazine.author.id }}"
-                                    class="text-decoration-none text-magshare fw-semibold">
+                                   class="text-decoration-none text-magshare fw-semibold">
                                     {{ magazine.title }}
                                 </a>
                             </td>
@@ -165,12 +163,46 @@
                 </table>
             </div>
         </div>
-
         <br/>
-        
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script>
+        function checkPasswordStrength() {
+            const newPass = document.getElementById("new_password").value;
+            const strengthText = document.getElementById("passwordStrength");
+            if (newPass.length >= 8) {
+                strengthText.textContent = "Password length looks good.";
+                strengthText.classList.remove("text-danger");
+                strengthText.classList.add("text-success");
+            } else {
+                strengthText.textContent = "Password must be at least 8 characters.";
+                strengthText.classList.remove("text-success");
+                strengthText.classList.add("text-warning");
+            }
+        }
 
+        function checkPasswordMatch() {
+            const newPass = document.getElementById("new_password").value;
+            const confirmPass = document.getElementById("confirm_password").value;
+            const feedback = document.getElementById("passwordMatchFeedback");
+
+            if (newPass === confirmPass && newPass.length >= 8) {
+                feedback.textContent = "Passwords match.";
+                feedback.classList.remove("text-danger");
+                feedback.classList.add("text-success");
+            } else {
+                feedback.textContent = "Passwords do not match.";
+                feedback.classList.remove("text-success");
+                feedback.classList.add("text-danger");
+            }
+        }
+
+        function validatePasswordMatch() {
+            const newPass = document.getElementById("new_password").value;
+            const confirmPass = document.getElementById("confirm_password").value;
+            return newPass === confirmPass;
+        }
+    </script>
+</body>
 </html>
