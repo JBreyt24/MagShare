@@ -4,6 +4,7 @@ from flask_app.models.user_model import User
 from flask_app.models.magazine_model import Magazine
 from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt(app)
+from flask_app.models.subscription_model import Subscription
 
 
 @app.route('/')
@@ -36,8 +37,14 @@ def register():
 def dashboard():
     if 'user_id' not in session:
         return redirect('/logout')
+    
+    user_id = session['user_id']
     all_magazines = Magazine.get_all_magazines_w_user()
-    return render_template('dashboard.html', all_magazines=all_magazines)
+    user_subscriptions = Subscription.get_user_subscriptions(user_id)
+    subscribed_ids = {mag['id'] for mag in user_subscriptions}  # Set of magazine IDs the user is subscribed to
+
+    return render_template('dashboard.html', all_magazines=all_magazines, subscribed_ids=subscribed_ids)
+
 
 
 @app.route('/login', methods=['POST'])
@@ -90,4 +97,60 @@ def update_user_info():
     session['email'] = form_data['email']
 
     flash("Your account info has been updated!", "success")
+    return redirect('/user/account')
+
+
+# Subscriptions
+
+@app.route('/subscriptions')
+def my_subscriptions():
+    if 'user_id' not in session:
+        return redirect('/logout')
+    subscriptions = Subscription.get_user_subscriptions(session['user_id'])  # ✅ FIXED
+    return render_template('subscriptions.html', subscriptions=subscriptions)
+
+
+@app.route('/user/account')
+def user_account_magazines():
+    if 'user_id' not in session:
+        return redirect('/logout')
+    
+    magazine_by_user = Magazine.get_all_magazines_w_user()
+    user_subscriptions = Subscription.get_user_subscriptions(session['user_id'])  # NEW
+
+    return render_template('account.html', magazine_by_user=magazine_by_user, subscriptions=user_subscriptions)
+
+
+# Password Update
+
+@app.route('/update/password', methods=['POST'])
+def update_password():
+    if 'user_id' not in session:
+        return redirect('/logout')
+
+    data = {
+        'id': session['user_id'],
+        'current_password': request.form['current_password'],
+        'new_password': request.form['new_password'],
+        'confirm_password': request.form['confirm_password']
+    }
+
+    user = User.get_by_id({'id': session['user_id']})
+
+    if not bcrypt.check_password_hash(user.password, data['current_password']):
+        flash("Current password is incorrect", "danger")
+        return redirect('/user/account')
+
+    if len(data['new_password']) < 8:
+        flash("New password must be at least 8 characters", "danger")
+        return redirect('/user/account')
+
+    if data['new_password'] != data['confirm_password']:
+        flash("New password and confirmation do not match", "danger")
+        return redirect('/user/account')
+
+    hashed_pw = bcrypt.generate_password_hash(data['new_password'])
+    User.update_password({'id': session['user_id'], 'password': hashed_pw})
+
+    flash("Password successfully updated!", "success")
     return redirect('/user/account')

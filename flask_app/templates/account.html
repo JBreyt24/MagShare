@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <title>Account</title>
+    <title>My Account</title>
     <style>
         :root {
             --magshare-orange: #ff8c00;
@@ -41,15 +41,14 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-magshare mb-4 shadow-sm">
         <div class="container">
-        <h3 class="text-center text-dark">MagShare</h3>
-        <div class="d-flex justify-content-center mb-4">
-            <img src="{{ url_for('static', filename='magshare.png') }}" alt="MagShare Logo"
-                style="max-height: 100px;">
-        </div>
+            <h3 class="text-center text-dark">MagShare</h3>
+            <div class="d-flex justify-content-center mb-4">
+                <img src="{{ url_for('static', filename='magshare.png') }}" alt="MagShare Logo"
+                    style="max-height: 100px;">
+            </div>
             <div class="d-flex">
-                <a href="/magazine/new" class="btn btn-dark me-2">Add Magazine</a>
                 <a href="/dashboard" class="btn btn-dark me-2">Dashboard</a>
-                <a href="/logout" class="btn btn-outline-dark">Log Out</a>
+                <a href="/logout" class="btn btn-outline-dark">Logout</a>
             </div>
         </div>
     </nav>
@@ -65,65 +64,110 @@
         {% endif %}
         {% endwith %}
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card bg-secondary text-white mb-4 shadow-sm">
-                    <div class="card-header">
-                        <h4 class="mb-0">Update Account</h4>
-                    </div>
-                    <div class="card-body">
-                        <form action="/update/account" method="post">
-                            <input type="hidden" name="id" value="{{ session['user_id'] }}">
-                            {% with messages = get_flashed_messages(category_filter=['account']) %}
-                            {% if messages %}
-                            {% for message in messages %}
-                            <p class="text-danger">{{ message }}</p>
-                            {% endfor %}
-                            {% endif %}
-                            {% endwith %}
-                            <div class="mb-3">
-                                <label for="first_name" class="form-label">First Name:</label>
-                                <input type="text" name="first_name" value="{{ session['first_name'] }}"
-                                    class="form-control" />
-                            </div>
-                            <div class="mb-3">
-                                <label for="last_name" class="form-label">Last Name:</label>
-                                <input type="text" name="last_name" value="{{ session['last_name'] }}"
-                                    class="form-control" />
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="email" name="email" value="{{ session['email'] }}" class="form-control" />
-                            </div>
-                            <button type="submit" class="btn btn-magshare">Update</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <h2 class="text-center mb-4">Welcome back, <span class="text-magshare">{{ session['first_name'] }}</span>!</h2>
 
-            <div class="col-md-6">
-                <div class="card bg-secondary text-white shadow-sm">
-                    <div class="card-header">
-                        <h4 class="mb-0 text-center">Your Magazines</h4>
-                    </div>
-                    <div class="card-body">
-                        {% for magazine in magazine_by_user %}
-                        {% if session['user_id'] == magazine.author.id %}
-                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                            <p class="mb-0">{{ magazine.title }}</p>
-                            <div>
-                                <a href="/magazine/edit/{{ magazine.id }}"
-                                    class="btn btn-outline-warning btn-sm me-2">Edit</a>
-                                <a href="/magazine/destroy/{{ magazine.id }}"
-                                    class="btn btn-outline-danger btn-sm">Delete</a>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% endfor %}
+        <!-- Subscription Summary -->
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card bg-dark text-white shadow-sm border-light">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Your Subscriptions</h5>
+                        <p class="card-text">
+                            You are subscribed to
+                            <span class="fw-bold text-magshare">{{ subscriptions|length }}</span>
+                            magazine{{ subscriptions|length != 1 and 's' or '' }}.
+                        </p>
+                        <a href="/subscriptions" class="btn btn-magshare">View Subscriptions</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Update Info + Change Password -->
+        <div class="row mb-4">
+            <div class="col-md-8 offset-md-2">
+                <!-- Update Info -->
+                <div class="card bg-secondary text-white shadow-sm mb-4">
+                    <div class="card-header">
+                        <h4 class="mb-0">Update Your Info</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/update/account" method="POST">
+                            <input type="hidden" name="id" value="{{ session['user_id'] }}">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" name="first_name" class="form-control" value="{{ session['first_name'] }}" required>
+                                </div>
+                                <div class="col">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" value="{{ session['last_name'] }}" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ session['email'] }}" required>
+                            </div>
+                            <button type="submit" class="btn btn-magshare">Update Info</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="card bg-secondary text-white shadow-sm">
+                    <div class="card-header">
+                        <h4 class="mb-0">Change Password</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/update/password" method="POST">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label">Current Password</label>
+                                <input type="password" name="current_password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                <input type="password" name="confirm_password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-magshare">Change Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User's Magazines -->
+        <div class="card bg-secondary text-white shadow-sm">
+            <div class="card-header">
+                <h4 class="mb-0">Magazines You've Added</h4>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-dark table-striped table-hover mb-0">
+                    <tbody>
+                        {% for magazine in magazine_by_user %}
+                        <tr>
+                            <td class="ps-4">
+                                <a href="/view/magazine/{{ magazine.id }}/{{ magazine.author.id }}"
+                                    class="text-decoration-none text-magshare fw-semibold">
+                                    {{ magazine.title }}
+                                </a>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <a href="/magazine/edit/{{ magazine.id }}" class="btn btn-sm btn-outline-warning me-2 text-light">Edit</a>
+                                <a href="/magazine/destroy/{{ magazine.id }}" class="btn btn-sm btn-outline-danger me-2 text-light">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <br/>
+        
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

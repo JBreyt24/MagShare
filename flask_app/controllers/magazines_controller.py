@@ -4,6 +4,8 @@ from flask_app.models.user_model import User
 from flask_app.models.magazine_model import Magazine 
 from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt(app)
+from flask_app.models.subscription_model import Subscription
+
 
 # Create Magazine
 
@@ -75,3 +77,46 @@ def destroy_magazine(magazine_id):
     Magazine.destroy_magazine(magazine_id)
     flash("Magazine deleted successfully!", "success")
     return redirect('/user/account')
+
+# Subscribe Magazine
+
+@app.route('/subscribe/<int:magazine_id>')
+def subscribe_to_magazine(magazine_id):
+    if 'user_id' not in session:
+        return redirect('/logout')
+
+    magazine = Magazine.get_one(magazine_id)
+
+    # Prevent subscribing to own magazine
+    if magazine.user_id == session['user_id']:
+        flash("You can't subscribe to your own magazine!", "danger")
+        return redirect('/dashboard')
+
+    data = {
+        "user_id": session['user_id'],
+        "magazine_id": magazine_id
+    }
+
+    if Subscription.has_user_subscribed(data):
+        flash("You've already subscribed to this magazine!", "info")
+        return redirect('/dashboard')
+
+    Subscription.subscribe(data)
+    flash("Subscribed successfully!", "success")
+    return redirect('/dashboard')
+
+
+
+@app.route('/unsubscribe/<int:magazine_id>')
+def unsubscribe_from_magazine(magazine_id):
+    if 'user_id' not in session:
+        return redirect('/logout')
+
+    data = {
+        "user_id": session['user_id'],
+        "magazine_id": magazine_id
+    }
+
+    Subscription.unsubscribe(data)
+    flash("Unsubscribed successfully!", "success")
+    return redirect('/dashboard')

@@ -89,6 +89,27 @@ class Magazine:
             one_magazine.author = User(magazine_dict)
             magazine_by_user.append(one_magazine)
         return magazine_by_user
+    
+
+    @classmethod
+    def get_user_subscriptions(cls, user_id):
+        query = """
+        SELECT magazines.* FROM subscriptions
+        JOIN magazines ON subscriptions.magazine_id = magazines.id
+        WHERE subscriptions.user_id = %(user_id)s;
+        """
+        data = { "user_id": user_id }
+        results = connectToMySQL(cls.myDB).query_db(query, data)
+        
+        if not results or isinstance(results, bool):
+            return []  # Return an empty list if query failed or no subscriptions
+
+        subscriptions = []
+        for magazine in results:
+            subscriptions.append(cls(magazine))
+        return subscriptions
+
+
 
 # Edit Magazine
 
@@ -115,3 +136,39 @@ class Magazine:
             "id": magazine_id
         }
         return connectToMySQL(cls.myDB).query_db(query, data)
+
+# Subscribe Magazine
+
+@classmethod
+def subscribe(cls, data):
+    query = """
+    INSERT INTO subscriptions (user_id, magazine_id)
+    VALUES (%(user_id)s, %(magazine_id)s);
+    """
+    return connectToMySQL(cls.myDB).query_db(query, data)
+
+@classmethod
+def get_user_subscriptions(cls, user_id):
+    query = """
+    SELECT magazines.*, users.id AS author_id, users.first_name, users.last_name, users.email, users.created_at AS user_created_at, users.updated_at AS user_updated_at
+    FROM subscriptions
+    JOIN magazines ON subscriptions.magazine_id = magazines.id
+    JOIN users ON magazines.user_id = users.id
+    WHERE subscriptions.user_id = %(user_id)s;
+    """
+    results = connectToMySQL(cls.myDB).query_db(query, {'user_id': user_id})
+    
+    subscriptions = []
+    for row in results:
+        magazine = cls(row)
+        magazine.author = User({
+            'id': row['author_id'],
+            'first_name': row['first_name'],
+            'last_name': row['last_name'],
+            'email': row['email'],
+            'password': None,
+            'created_at': row['user_created_at'],
+            'updated_at': row['user_updated_at']
+        })
+        subscriptions.append(magazine)
+    return subscriptions

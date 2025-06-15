@@ -126,3 +126,10 @@ class User:
         WHERE id = %(id)s;
         """
         return connectToMySQL(cls.myDB).query_db(query, data)
+
+# Password Update
+
+    @classmethod
+    def update_password(cls, data):
+        query = "UPDATE users SET password = %(password)s, updated_at = NOW() WHERE id = %(id)s;"
+        return connectToMySQL(cls.myDB).query_db(query, data)
